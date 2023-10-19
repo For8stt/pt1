@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/ulian/CLionProjects/pt1/cmake-build-debug"
+			"value" : "/Users/ulian/CLionProjects/pt1/pt1/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -383,7 +383,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/ulian/CLionProjects/pt1/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "/Users/ulian/CLionProjects/pt1/pt1/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -443,7 +443,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/ulian/CLionProjects/pt1"
+			"value" : "/Users/ulian/CLionProjects/pt1/pt1"
 		},
 		{
 			"name" : "CMAKE_INSTALL_NAME_TOOL",
@@ -1015,7 +1015,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/ulian/CLionProjects/pt1/cmake-build-debug"
+			"value" : "/Users/ulian/CLionProjects/pt1/pt1/cmake-build-debug"
 		},
 		{
 			"name" : "pt1_IS_TOP_LEVEL",
@@ -1039,7 +1039,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/ulian/CLionProjects/pt1"
+			"value" : "/Users/ulian/CLionProjects/pt1/pt1"
 		}
 	],
 	"kind" : "cache",

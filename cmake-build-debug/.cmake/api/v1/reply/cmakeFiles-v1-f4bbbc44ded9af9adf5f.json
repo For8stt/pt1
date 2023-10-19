@@ -625,8 +625,8 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "/Users/ulian/CLionProjects/pt1/cmake-build-debug",
-		"source" : "/Users/ulian/CLionProjects/pt1"
+		"build" : "/Users/ulian/CLionProjects/pt1/pt1/cmake-build-debug",
+		"source" : "/Users/ulian/CLionProjects/pt1/pt1"
 	},
 	"version" : 
 	{
