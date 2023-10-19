@@ -1,0 +1,3 @@
+/Users/ulian/CLionProjects/pt1/cmake-build-debug/CMakeFiles/pt1.dir
+/Users/ulian/CLionProjects/pt1/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/ulian/CLionProjects/pt1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
