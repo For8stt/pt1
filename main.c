@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 void uvolni(char** polia, int row);
 
@@ -24,12 +25,12 @@ int v(FILE**f, char**polia,int n_l_rec,int records){
             printf("for dinamics pols\n");
 
             for(int j=0; j<records;j++) {//displays dynamic fields in blocks (10 pcs)
-                printf("ID. mer. modulu: %s", polia[r]);
-                printf("Pozícia modulu: %s", polia[r+1]);
-                printf("Typ mer. veliciny: %s", polia[r+2]);
-                printf("Hodnota: %s", polia[r+3]);
-                printf("Cas merania: %s", polia[r+4]);
-                printf("Datum merania: %s", polia[r+5]);
+                printf("ID. mer. modulu: %s\n", polia[r]);
+                printf("Pozícia modulu: %s\n", polia[r+1]);
+                printf("Typ mer. veliciny: %s\n", polia[r+2]);
+                printf("Hodnota: %s\n", polia[r+3]);
+                printf("Cas merania: %s\n", polia[r+4]);
+                printf("Datum merania: %s\n", polia[r+5]);
                 printf("\n");
                 r+=n_l_rec;
             }
@@ -92,6 +93,7 @@ int v(FILE**f, char**polia,int n_l_rec,int records){
 
     return 0;
 }
+
 int n(FILE*f,char ***polia,int* row,int *records,int *n_l_rec){
     if (f == NULL) {//Ak súbor nie je otvorený(t.j. ešte nebol vykonaný príkaz ‘v’)
         fprintf(stderr,"Neotvoreny subor.\n");
@@ -113,10 +115,10 @@ int n(FILE*f,char ***polia,int* row,int *records,int *n_l_rec){
 
     }
     ///підрахунок та виведення блоків звписів та скільки строк в блоці
-    printf("%d\n",(*records));
-    printf("%d\n",(*row)+1);
+    printf("records: %d\n",(*records));
+    printf("row: %d\n",(*row)+1);
     *n_l_rec=((*row)+1)/(*records);//to read the last empty line
-    printf("%d\n",*n_l_rec);
+    printf("n_l_rec: %d\n\n",*n_l_rec);
     rewind(f);
 
     if (*polia != NULL) { // Uvoľnite pamäť, ak pole už existuje
@@ -132,6 +134,23 @@ int n(FILE*f,char ***polia,int* row,int *records,int *n_l_rec){
     for (int i = 0; i < *row; i++) {//Zapís takom poradí, v akom sú v textovom súbore
         fgets(line, sizeof(line), f);
         (*polia)[i] = strdup(line);
+        ///обрізання рядка
+        char *str=(*polia)[i];
+        int start = 0;
+        size_t end = strlen(str) - 1;
+        // Знаходження індексу першого непробільного символу з початку рядка
+        while (isspace(str[start])) {
+            start++;
+        }
+        // Знаходження індексу останнього непробільного символу з кінця рядка
+        while (end > start && isspace(str[end])) {
+            end--;
+        }
+        // Зміна рядка, щоб він включав лише символи без пробілів
+        memmove(str, str + start, end - start + 1);
+        str[end - start + 1] = '\0';
+        ///
+
     }
 
     rewind(f);
@@ -142,41 +161,156 @@ int c(char **polia,int records,int n_l_rec){
     int y;
     char line[100];
     int row_k=0;
+    int records_k=0;
 
-    //scanf("%d",&y);//načíta celé číslo Y
+    if (polia==NULL){//checking for created fields
+        fprintf(stderr,"Polia nie su vytvorene\n");
+        return 1;
+    }
+
+    scanf("%d",&y);//načíta celé číslo Y
+    ///створює динамічні рядки та підщитує його рядки та тп.
+    y*=100;
     FILE *k;
+
     k= fopen("ciachovanie.txt","r+");
     while (fgets(line,sizeof(line),k)!=NULL){
         row_k+=1;
+        if(strlen(line) == 0 || line[0] == '\n'){
+            ++records_k;
+        }
     }
+    if (strlen(line) > 0 && (line[strlen(line) - 1] == '\n' || line[strlen(line) - 1] == '\r')) {
+        ++records_k;
+    }
+    printf("row_k: %d\n",(row_k+1));
+    printf("records_k: %d\n",records_k);
+    int n_l_rec_k=(row_k+1)/(records_k);//to read the last empty line
+    printf("n_l_rec_k: %d\n\n",n_l_rec_k);
 
     rewind(k);
-    printf("%d\n",(row_k+1));
     char **polia_k=NULL;
     polia_k=(char**)malloc(row_k * sizeof(char*));
     for (int i = 0; i < row_k; i++) {//Zapís takom poradí, v akom sú v textovom súbore
         fgets(line, sizeof(line), k);
         (polia_k)[i] = strdup(line);
+        ///обрізання кінців строк
+        char *str_k=(polia_k)[i];
+        int start = 0;
+        size_t end = strlen(str_k) - 1;
+        while (isspace(str_k[start])) {
+            start++;
+        }
+        while (end > start && isspace(str_k[end])) {
+            end--;
+        }
+        memmove(str_k, str_k + start, end - start + 1);
+        str_k[end - start + 1] = '\0';
+        ///
     }
 
 
     int r=0;
     int g=0;
+    int all_lines=0;
+    int all_lines_correct=0;//string validation
+    int number_of_lines[records];
+    memset(number_of_lines, 0, sizeof(number_of_lines));//встановив всі зміні масиву на нуль
+    int of=0;
+
     for(int i = 0; i < records; i++) {
         for (int j = 0; j < row_k; j++) {
             if (strcmp(polia[r], polia_k[g]) == 0) {
-                printf("Поле %s ідентичне полю в %d %d в ciachovanie.txt\n", polia[r],g ,r);
+                if (of < records) {//провірка , можна видалити
+                    number_of_lines[of] = r;
+                    ++of;
+                }
+                ++all_lines;
+//                printf("Поле %s ідентичне полю %s в %d %d в ciachovanie.txt\n", polia[r], polia_k[g], r, g); провірка для себе, можна видилити при відправці
+                char *endptr_k;
+                char *endptr;
+                ++g;
+                r += 5;
+                long date_k = strtol(polia_k[g], &endptr_k, 10);
+                long date = strtol(polia[r], &endptr, 10);
+                r -= 5;
+                --g;
+
+                if (date_k < date) {
+                    long e = date - date_k;
+                    if (e > y) {
+                        e /= 100;
+                        y /= 100;
+                        e = e - y;
+                        printf("ID. mer. modulu [%s] má %ld mesiacov po ciachovani\n", polia[r], e);
+                        y *= 100;
+
+                    }
+//                    printf("%s менше, ніж %s\n", polia_k[g], polia[r]); також провірка, можна видилити до відправки
+
+                } else {
+                    ++all_lines_correct;//для провірки чи поля при ciachovani рівні
+                }
+
                 break;  // Якщо знайдено ідентичне поле, перейти до наступного поля
             }
-            g+=row_k;
+            g+=n_l_rec_k;
+            if(g>=row_k/*17*/){///код
+                break;
+            }
+
         }
         r += n_l_rec;
     }
 
+/////////
+    int is_present_7_to_35 = 1;
+    int is_present_42_to_56 = 1;
+    int is_present_63 = 1;
+
+    for (int i = 0; i <= 35; i+=7) {
+        for (int j = 0; j < 6; ++j) {
+            if (number_of_lines[j] == i) {
+                is_present_7_to_35 = 0;
+                break;
+            }
+        }
+    }
+
+    for (int i = 42; i <= 56; i+=7) {
+        for (int j = 6; j < 9; ++j) {
+            if (number_of_lines[j] == i) {
+                is_present_42_to_56 = 0;
+                break;
+            }
+        }
+    }
+
+    if (number_of_lines[9] == 63) {
+        is_present_63 = 0;
+    }
 
 
+    if (is_present_7_to_35) {
+        printf("ID. mer. modulu [%s] nie je ciachovany.\n",polia[7]);
+    }
+    if (is_present_42_to_56) {
+        printf("ID. mer. modulu [%s] nie je ciachovany.\n",polia[42]);
+    }
+    if (is_present_63) {
+        printf("ID. mer. modulu [%s] nie je ciachovany.\n",polia[63]);
+    }
 
-    for (int i = 0; i < row_k; ++i) {
+//////////
+    printf("\n");
+    if(number_of_lines[records]!=0) {//випишше що всі Ід коректні якщо всі були ciachovany
+        if (all_lines == all_lines_correct) {//checking that all lines are correct
+            printf("Data su korektne.");
+        }
+    }
+
+
+    for (int i = 0; i < row_k; ++i) {//все звільняє
         free(polia_k[i]);
     }
     free(polia_k);
@@ -184,6 +318,9 @@ int c(char **polia,int records,int n_l_rec){
     return 0;
 }
 
+int s (){
+    return 0;
+}
 
 void uvolni(char**polia,int row){
     for (int i = 0; i < row; ++i) {
@@ -210,6 +347,9 @@ int main() {
         }
         if (option == 'c') {
             c(polia,records,n_l_rec);
+        }
+        if(option=='s'){
+            s();
         }
         if (option == 'k') {
             fclose(f);
