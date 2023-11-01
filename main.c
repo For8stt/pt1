@@ -10,6 +10,7 @@ int v(FILE**f, char**polia,int n_l_rec,int records){
     //program zistí, či txt súbor už bol otvorený
     ///повино провіряти чи файл вже открит після n
     ///помилка мабуть є в цьому
+    /// перевірити чи нормально відкриває файл якщо його немає r+ w
     //
     if(*f==NULL){
         printf("súbor ešte nebol otvorený\n");
@@ -318,7 +319,125 @@ int c(char **polia,int records,int n_l_rec){
     return 0;
 }
 
-int s (){
+int s (char **polia,int row,int n_l_rec,int records){
+    if (polia==NULL){ //checking if the fields are created
+        fprintf(stderr,"Polia nie su vytvorene.");
+        return 1;
+    }
+
+    char mermodul[5];
+    char typmer[3];
+    int cislaid[records];
+    int cislaidtyp[records];
+    int cislageneral[records];
+    int k=0;
+
+    scanf("%s %s",mermodul,typmer);
+    printf("Верхній регістр: %s\n", mermodul);
+    printf("Нижній регістр: %s\n", typmer);
+
+    for (int i = 0; i < row; i+= n_l_rec) {//finds identical ID. mer. modulu
+        if (strcmp(polia[i], mermodul) == 0) {
+            cislaid[k]=i;
+            k++;
+        }
+    }
+    k=0;
+    for (int i = 2; i < row; i+= n_l_rec) {//finds identical Typ mer. veliciny
+        if (strcmp(polia[i], typmer) == 0) {
+            cislaidtyp[k]=i;
+            k++;
+        }
+    }
+    k=0;
+
+    //які блоки знайшло
+    int h=0;
+    for (int i = 0; i < records; ++i) {//which ID and Typ mer intersect
+        for (int j = 0; j < records; ++j) {
+            if(cislaidtyp[j]-cislaid[i]==2){
+                cislageneral[k]=cislaid[i];
+                k++;
+                h++;
+                printf("%d ",h);
+                break;
+            }
+        }
+    }
+    printf("%d",h);
+    //checks if there are records for input
+
+    if(h==0){
+        fprintf(stderr,"Pre dany vstup neexistuju zaznamy");
+        return 1;
+    }
+
+    FILE *filed;
+
+    if ((filed=fopen("output_S.txt","w"))==NULL){
+        fprintf(stderr,"Nepodarilo otvorit");
+        return 1;
+    }
+    //
+
+
+
+    char resultpolia[k][strlen(polia[4])+strlen(polia[5])+1];
+    for (int i = 0; i < k; ++i) {//datum+cas
+        resultpolia[i][0] = '\0';
+        strcat(resultpolia[i], polia[cislageneral[i]+5]);
+        strcat(resultpolia[i], polia[cislageneral[i]+4]);
+    }
+    for (int i = 0; i < k-1; i++) {//sorts by value: datum+cas
+        for (int j = 0; j < k-i-1; j++) {
+            if (strcmp(resultpolia[j], resultpolia[j + 1]) > 0){
+                char temp[strlen(polia[4]) + strlen(polia[5]) + 1];
+                strcpy(temp, resultpolia[j]);
+                strcpy(resultpolia[j], resultpolia[j + 1]);
+                strcpy(resultpolia[j + 1], temp);
+                int presort=cislageneral[j];
+                cislageneral[j]=cislageneral[j+1];
+                cislageneral[j+1]=presort;
+            }
+        }
+    }
+
+
+    char pozmodl[k][15];
+    char part1[k][8];
+    char part2[k][8];
+    char strfloat[k][10];
+    float number=0;
+    char combined[k][50];
+    for (int i = 0; i < k; ++i) {//concatenates sorted strings
+        strncpy(pozmodl[i], polia[cislageneral[i]+1], 14);
+        pozmodl[i][14] = '\0';// Додаю завершуючий нуль для визначення кінця рядка
+        sscanf(pozmodl[i],"%7s %7s",part1[i],part2[i]);
+        number=atof(polia[cislageneral[i]+3]);
+        sprintf(strfloat[i], "%.5f", number);
+        sprintf(combined[i], "%s\t%s\t%s\t %s", resultpolia[i], strfloat[i], part1[i], part2[i]);
+
+    }
+    ///
+    printf("\n");
+    for (int i = 0; i < k; ++i) {
+    printf("Об'єднаний рядок: %s\n", combined[i]);
+    }
+    ///
+
+    if (filed != NULL) {
+        for (int i = 0; i < k; ++i) {
+            fprintf(filed,"%s\n", combined[i]);
+        }
+        if (fclose(filed) == 0) {
+             printf("Pre dany vstup je vytvoreny txt subor.\n");
+        } else {
+        printf("súbor sa nepodarilo zatvoriť. Pre dany vstup nie je vytvoreny txt .\n");
+         }
+    } else {
+        printf("chyba pri otváraní súboru\n");
+    }
+
     return 0;
 }
 
@@ -349,7 +468,7 @@ int main() {
             c(polia,records,n_l_rec);
         }
         if(option=='s'){
-            s();
+            s(polia,row,n_l_rec,records);
         }
         if (option == 'k') {
             fclose(f);
