@@ -325,11 +325,14 @@ int s (char **polia,int row,int n_l_rec,int records){
         return 1;
     }
 
-    char mermodul[5];
+    char mermodul[6];
     char typmer[3];
     int cislaid[records];
+    memset(cislaid, 0, sizeof(cislaid));
     int cislaidtyp[records];
+    memset(cislaidtyp, 0, sizeof(cislaidtyp));
     int cislageneral[records];
+    memset(cislageneral, 0, sizeof(cislageneral));
     int k=0;
 
     scanf("%s %s",mermodul,typmer);
@@ -339,6 +342,7 @@ int s (char **polia,int row,int n_l_rec,int records){
     for (int i = 0; i < row; i+= n_l_rec) {//finds identical ID. mer. modulu
         if (strcmp(polia[i], mermodul) == 0) {
             cislaid[k]=i;
+///            printf("polia[%d] і mermodul ідентичні\n",i);
             k++;
         }
     }
@@ -346,6 +350,7 @@ int s (char **polia,int row,int n_l_rec,int records){
     for (int i = 2; i < row; i+= n_l_rec) {//finds identical Typ mer. veliciny
         if (strcmp(polia[i], typmer) == 0) {
             cislaidtyp[k]=i;
+///            printf("polia[%d] і mermodul ідентичні\n",i);
             k++;
         }
     }
@@ -357,20 +362,28 @@ int s (char **polia,int row,int n_l_rec,int records){
         for (int j = 0; j < records; ++j) {
             if(cislaidtyp[j]-cislaid[i]==2){
                 cislageneral[k]=cislaid[i];
+//                printf("cislageneral[%d] je %d\n",k,cislageneral[k]);
                 k++;
                 h++;
-                printf("%d ",h);
                 break;
             }
         }
     }
-    printf("%d",h);
     //checks if there are records for input
 
     if(h==0){
         fprintf(stderr,"Pre dany vstup neexistuju zaznamy");
         return 1;
     }
+///
+//    for (int i = 0; i <k; ++i) {
+//        printf("%s\n",polia[cislageneral[i]+4]);
+//    }
+//    printf("\n");
+//    for (int i = 0; i <k; ++i) {
+//        printf("%s\n",polia[cislageneral[i]+5]);
+//    }
+///
 
     FILE *filed;
 
@@ -387,6 +400,7 @@ int s (char **polia,int row,int n_l_rec,int records){
         resultpolia[i][0] = '\0';
         strcat(resultpolia[i], polia[cislageneral[i]+5]);
         strcat(resultpolia[i], polia[cislageneral[i]+4]);
+//        printf("resultpolia do sort; %s\n",resultpolia[i]);
     }
     for (int i = 0; i < k-1; i++) {//sorts by value: datum+cas
         for (int j = 0; j < k-i-1; j++) {
@@ -401,6 +415,14 @@ int s (char **polia,int row,int n_l_rec,int records){
             }
         }
     }
+    ///
+    printf("\n");
+//    for (int i = 0; i < k; ++i) {
+//        printf("po sort resultpolia; %s\n",resultpolia[i]);
+//        printf("cislageneral[%d] je %d\n",i,cislageneral[i]);
+//    }
+//    printf("\n");
+    ///
 
 
     char pozmodl[k][15];
@@ -418,6 +440,15 @@ int s (char **polia,int row,int n_l_rec,int records){
         sprintf(combined[i], "%s\t%s\t%s\t %s", resultpolia[i], strfloat[i], part1[i], part2[i]);
 
     }
+    ///
+//    for (int i = 0; i < k; ++i) {
+//        printf("pozmodl[%d] je %s\n",cislageneral[i]+1,pozmodl[i]);
+//        printf("Частина 1: %s\n", part1[i]);
+//        printf("Частина 2: %s\n", part2[i]);
+//        printf("\n");
+//        printf("strfloat[%d] Рядок: %s\n",cislageneral[i]+3 ,strfloat[i]);
+//        printf("\n");
+//    }
     ///
     printf("\n");
     for (int i = 0; i < k; ++i) {
@@ -441,6 +472,70 @@ int s (char **polia,int row,int n_l_rec,int records){
     return 0;
 }
 
+int h(char **polia,int row,int n_l_rec,int records){
+
+    char *typeStrings[] = {"RM", "RD", "RO","PI","PE","PA"};
+    int numTypes=sizeof(typeStrings) / sizeof(typeStrings[0]);//скільки типів записів
+    int count[records];
+    memset(count, 0, sizeof(count));
+    int located[sizeof(typeStrings) / sizeof(typeStrings[0])][records];//скільки типів записів та всього скільки блоків
+
+    for (int i = 2; i < row; i+=n_l_rec) {//порівнює Typ mer. vel считає скільки є та їхню локацію
+        if (strcmp(typeStrings[0],polia[i])==0){
+            located[0][count[0]]=i;
+            count[0]++;
+        }
+        if (strcmp(typeStrings[1],polia[i])==0){
+            located[1][count[1]]=i;
+            count[1]++;
+        }
+        if (strcmp(typeStrings[2],polia[i])==0){
+            located[2][count[2]]=i;
+            count[2]++;
+        }
+        if (strcmp(typeStrings[3],polia[i])==0){
+            located[3][count[3]]=i;
+            count[3]++;
+        }
+        if (strcmp(typeStrings[4],polia[i])==0){
+            located[4][count[4]]=i;
+            count[4]++;
+        }
+        if (strcmp(typeStrings[5],polia[i])==0){
+            located[5][count[5]]=i;
+            count[5]++;
+        }
+    }
+    // створюємо кільуісь записів мін та макс та робим рядки по 7
+    char min[sizeof(typeStrings) / sizeof(typeStrings[0])][7];
+    char max[sizeof(typeStrings) / sizeof(typeStrings[0])][7];
+    for (int j = 0; j < numTypes; ++j) {//відсортовуємо макс та мінімум
+        if(count[j]!=0){//якщо є зписи Typ mer. vel
+            strcpy(min[j], polia[located[j][0]+1]);
+            strcpy(max[j], polia[located[j][0]+1]);
+
+            for (int i = 1; i < count[j]; ++i) {
+                if (strcmp(polia[located[j][i]+1],min[j])<0) {
+                    strcpy(min[j], polia[located[j][i]+1]);
+                }
+
+                if (strcmp(polia[located[j][i]+1],min[j])>0) {
+                    strcpy(max[j], polia[located[j][i]+1]);
+                }
+            }
+
+        }
+    }
+    //виписує записи
+    printf("%-15s %-10s %-10s %-10s\n", "Typ mer. vel", "Pocetnost", "Minimum", "Maximum");
+    for (int i = 0; i < numTypes; ++i) {
+        if (count[i]!=0){
+            printf("%-15s %-10d %-10s %-10s\n",typeStrings[i],count[i],min[i],max[i]);
+        }
+    }
+    return 0;
+
+}
 void uvolni(char**polia,int row){
     for (int i = 0; i < row; ++i) {
         free(polia[i]);
@@ -469,6 +564,9 @@ int main() {
         }
         if(option=='s'){
             s(polia,row,n_l_rec,records);
+        }
+        if(option=='h'){
+            h(polia,row,n_l_rec,records);
         }
         if (option == 'k') {
             fclose(f);
