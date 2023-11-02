@@ -321,7 +321,7 @@ int c(char **polia,int records,int n_l_rec){
 
 int s (char **polia,int row,int n_l_rec,int records){
     if (polia==NULL){ //checking if the fields are created
-        fprintf(stderr,"Polia nie su vytvorene.");
+        fprintf(stderr,"Polia nie su vytvorene.\n");
         return 1;
     }
 
@@ -336,13 +336,12 @@ int s (char **polia,int row,int n_l_rec,int records){
     int k=0;
 
     scanf("%s %s",mermodul,typmer);
-    printf("Верхній регістр: %s\n", mermodul);
-    printf("Нижній регістр: %s\n", typmer);
+    printf("ID. mer. modulu: %s\n", mermodul);
+    printf("Typ mer. veliciny: %s\n", typmer);
 
     for (int i = 0; i < row; i+= n_l_rec) {//finds identical ID. mer. modulu
         if (strcmp(polia[i], mermodul) == 0) {
             cislaid[k]=i;
-///            printf("polia[%d] і mermodul ідентичні\n",i);
             k++;
         }
     }
@@ -350,7 +349,6 @@ int s (char **polia,int row,int n_l_rec,int records){
     for (int i = 2; i < row; i+= n_l_rec) {//finds identical Typ mer. veliciny
         if (strcmp(polia[i], typmer) == 0) {
             cislaidtyp[k]=i;
-///            printf("polia[%d] і mermodul ідентичні\n",i);
             k++;
         }
     }
@@ -362,7 +360,6 @@ int s (char **polia,int row,int n_l_rec,int records){
         for (int j = 0; j < records; ++j) {
             if(cislaidtyp[j]-cislaid[i]==2){
                 cislageneral[k]=cislaid[i];
-//                printf("cislageneral[%d] je %d\n",k,cislageneral[k]);
                 k++;
                 h++;
                 break;
@@ -372,18 +369,9 @@ int s (char **polia,int row,int n_l_rec,int records){
     //checks if there are records for input
 
     if(h==0){
-        fprintf(stderr,"Pre dany vstup neexistuju zaznamy");
+        fprintf(stderr,"Pre dany vstup neexistuju zaznamy\n");
         return 1;
     }
-///
-//    for (int i = 0; i <k; ++i) {
-//        printf("%s\n",polia[cislageneral[i]+4]);
-//    }
-//    printf("\n");
-//    for (int i = 0; i <k; ++i) {
-//        printf("%s\n",polia[cislageneral[i]+5]);
-//    }
-///
 
     FILE *filed;
 
@@ -391,16 +379,12 @@ int s (char **polia,int row,int n_l_rec,int records){
         fprintf(stderr,"Nepodarilo otvorit");
         return 1;
     }
-    //
-
-
 
     char resultpolia[k][strlen(polia[4])+strlen(polia[5])+1];
     for (int i = 0; i < k; ++i) {//datum+cas
         resultpolia[i][0] = '\0';
         strcat(resultpolia[i], polia[cislageneral[i]+5]);
         strcat(resultpolia[i], polia[cislageneral[i]+4]);
-//        printf("resultpolia do sort; %s\n",resultpolia[i]);
     }
     for (int i = 0; i < k-1; i++) {//sorts by value: datum+cas
         for (int j = 0; j < k-i-1; j++) {
@@ -417,12 +401,6 @@ int s (char **polia,int row,int n_l_rec,int records){
     }
     ///
     printf("\n");
-//    for (int i = 0; i < k; ++i) {
-//        printf("po sort resultpolia; %s\n",resultpolia[i]);
-//        printf("cislageneral[%d] je %d\n",i,cislageneral[i]);
-//    }
-//    printf("\n");
-    ///
 
 
     char pozmodl[k][15];
@@ -440,19 +418,10 @@ int s (char **polia,int row,int n_l_rec,int records){
         sprintf(combined[i], "%s\t%s\t%s\t %s", resultpolia[i], strfloat[i], part1[i], part2[i]);
 
     }
-    ///
-//    for (int i = 0; i < k; ++i) {
-//        printf("pozmodl[%d] je %s\n",cislageneral[i]+1,pozmodl[i]);
-//        printf("Частина 1: %s\n", part1[i]);
-//        printf("Частина 2: %s\n", part2[i]);
-//        printf("\n");
-//        printf("strfloat[%d] Рядок: %s\n",cislageneral[i]+3 ,strfloat[i]);
-//        printf("\n");
-//    }
-    ///
+
     printf("\n");
     for (int i = 0; i < k; ++i) {
-    printf("Об'єднаний рядок: %s\n", combined[i]);
+    printf("Zreťazený reťazec: %s\n", combined[i]);
     }
     ///
 
@@ -473,7 +442,10 @@ int s (char **polia,int row,int n_l_rec,int records){
 }
 
 int h(char **polia,int row,int n_l_rec,int records){
-
+    if (polia==NULL){ //checking if the fields are created
+        fprintf(stderr,"Polia nie su vytvorene.\n");
+        return 1;
+    }
     char *typeStrings[] = {"RM", "RD", "RO","PI","PE","PA"};
     int numTypes=sizeof(typeStrings) / sizeof(typeStrings[0]);//скільки типів записів
     int count[records];
@@ -536,6 +508,89 @@ int h(char **polia,int row,int n_l_rec,int records){
     return 0;
 
 }
+
+int z(char ***polia,int *row, int *records, int n_l_rec){
+    char mermodul[6];
+    int cislamer[*records];
+    memset(cislamer, 0, sizeof(cislamer));
+
+    scanf("%s",mermodul);
+    printf("ID. mer. modulu: %s\n", mermodul);
+
+    if (polia==NULL){ //checking if the fields are created
+        fprintf(stderr,"Polia nie su vytvorene.\n");
+        return 1;
+    }
+
+    int k=0;
+
+    for (int i = 0; i < *row; i+= n_l_rec) {//finds identical ID. mer. modulu
+        if (strcmp((*polia)[i], mermodul) == 0) {
+            cislamer[k]=i;
+            k++;
+
+        }
+    }
+    if(k==0){//провірка на те чи знайдений Ід
+        fprintf(stderr,"Pre dany vstup neexistuju zaznamy");
+        return 1;
+    }
+
+    int row_to_remove_start[k];
+    int row_to_remove_end[k];
+
+    for (int i = 0; i < k; ++i) {
+        row_to_remove_start[i]=cislamer[i];
+    }
+    for (int i = 0; i < k; ++i) {
+        row_to_remove_end[i]=cislamer[i]+6;
+    }
+
+    int removed_rows = 0;
+    for (int i = 0; i < k; ++i) {
+        removed_rows += (row_to_remove_end[i] - row_to_remove_start[i] + 1);
+    }
+
+    int new_row_size = *row - removed_rows;
+    char **temp_polia = (char **)calloc(new_row_size , sizeof(char *));
+    int new_row_index = 0;
+    for (int i = 0; i < *row; ++i) {//видаляє рядки
+        int in_removed_range = 0;
+        for (int j = 0; j < k; ++j) {
+            if (i >= row_to_remove_start[j] && i <= row_to_remove_end[j]) {//якщо вірно то не перезаписує а видалює пізніше по циклу
+                in_removed_range = 1;
+                break;
+            }
+        }
+
+        if (!in_removed_range) {
+            temp_polia[new_row_index] = (*polia)[i];
+            if (temp_polia[new_row_index] == NULL) {
+                fprintf(stderr, "Chyba alokacie pamate.");
+                return 1;
+            }
+            new_row_index++;
+        } else {
+            // Звільнення пам'яті для видалених рядків
+            free((*polia)[i]);
+        }
+    }
+
+    for (int i = new_row_index; i < new_row_size; ++i) {
+        temp_polia[i] = NULL;
+    }
+
+
+
+
+    *polia = temp_polia;
+    // Оновлення кількості рядків у головній функції та записів
+    *row = new_row_size;
+    *records-=k;
+    printf("Vymazalo sa: %d zaznamov!\n", k);
+
+    return 0;
+}
 void uvolni(char**polia,int row){
     for (int i = 0; i < row; ++i) {
         free(polia[i]);
@@ -567,6 +622,9 @@ int main() {
         }
         if(option=='h'){
             h(polia,row,n_l_rec,records);
+        }
+        if(option=='z'){
+            z(&polia,&row, &records,n_l_rec);
         }
         if (option == 'k') {
             fclose(f);
