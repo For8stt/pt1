@@ -6,13 +6,11 @@
 void uvolni(char** polia, int row);
 
 int v(FILE**f, char**polia,int n_l_rec,int records){
-    //
-    //program zistí, či txt súbor už bol otvorený
+
     ///повино провіряти чи файл вже открит після n
     ///помилка мабуть є в цьому
     /// перевірити чи нормально відкриває файл якщо його немає r+ w
-    //
-    if(*f==NULL){
+    if(*f==NULL){//the program detects whether the txt file has already been opened
         printf("súbor ešte nebol otvorený\n");
         if((*f= fopen("dataloger.txt","r+"))!=NULL) {
             printf("Subor bol uspesne otvoreny\n");
@@ -20,10 +18,9 @@ int v(FILE**f, char**polia,int n_l_rec,int records){
             printf("Neotvoreny subor\n");
         }
     }
-    if (*f!=NULL){/*V prípade úspešného otvorenia txt súboru*/
-        if (polia!=NULL){//ak už boli vytvorené dynamické polia, zapíše sa z nich
+    if (*f!=NULL){/*In case of successful opening of the txt file*/
+        if (polia!=NULL){//if dynamic fields have already been created, they will be written from
             int r=0;
-            printf("for dinamics pols\n");
 
             for(int j=0; j<records;j++) {//displays dynamic fields in blocks (10 pcs)
                 printf("ID. mer. modulu: %s\n", polia[r]);
@@ -36,7 +33,7 @@ int v(FILE**f, char**polia,int n_l_rec,int records){
                 r+=n_l_rec;
             }
 
-        }else{//ak nie, bude čítať a zapisovať na obrazovku zo súboru
+        }else{//if not, it will read and write to the screen from the file
             char line[100];
             rewind(*f);
             char identifier[6];
@@ -83,11 +80,11 @@ int v(FILE**f, char**polia,int n_l_rec,int records){
 
             }
             ///провірка для себе чи до кінця прочитався файл
-            if (feof(*f)) {
-                printf("Кінець файлу досягнутий.\n");
-            } else if (ferror(*f)) {
-                perror("Помилка читання файлу");
-            }
+//            if (feof(*f)) {
+//                printf("End of file reached.\n");
+//            } else if (ferror(*f)) {
+//                perror("Error reading file");
+//            }
             rewind(*f);
         }
     }
@@ -96,7 +93,7 @@ int v(FILE**f, char**polia,int n_l_rec,int records){
 }
 
 int n(FILE*f,char ***polia,int* row,int *records,int *n_l_rec){
-    if (f == NULL) {//Ak súbor nie je otvorený(t.j. ešte nebol vykonaný príkaz ‘v’)
+    if (f == NULL) {//If the file is not open (i.e. the 'v' command has not yet been executed)
         fprintf(stderr,"Neotvoreny subor.\n");
         return 1;
     }
@@ -110,19 +107,16 @@ int n(FILE*f,char ***polia,int* row,int *records,int *n_l_rec){
             ++(*records);
         }
     }
-    // Додаткова перевірка для останнього рядка
+    // Additional verification for the last line
     if (strlen(line) > 0 && (line[strlen(line) - 1] == '\n' || line[strlen(line) - 1] == '\r')) {
         ++(*records);
 
     }
-    ///підрахунок та виведення блоків звписів та скільки строк в блоці
-    printf("records: %d\n",(*records));
-    printf("row: %d\n",(*row)+1);
+    //counting blocks of entries
     *n_l_rec=((*row)+1)/(*records);//to read the last empty line
-    printf("n_l_rec: %d\n\n",*n_l_rec);
     rewind(f);
 
-    if (*polia != NULL) { // Uvoľnite pamäť, ak pole už existuje
+    if (*polia != NULL) { // Free the memory if the array already exists
         //uvolni(polia, row);
         for (int i = 0; i < *row; i++) {
             free((*polia)[i]);
@@ -132,22 +126,22 @@ int n(FILE*f,char ***polia,int* row,int *records,int *n_l_rec){
 
     *polia=(char**)malloc(*row * sizeof(char*)); ///sizeof(line)
 
-    for (int i = 0; i < *row; i++) {//Zapís takom poradí, v akom sú v textovom súbore
+    for (int i = 0; i < *row; i++) {//Write them in the order they are in the text file
         fgets(line, sizeof(line), f);
         (*polia)[i] = strdup(line);
-        ///обрізання рядка
+        ///cutting the line
         char *str=(*polia)[i];
         int start = 0;
         size_t end = strlen(str) - 1;
-        // Знаходження індексу першого непробільного символу з початку рядка
+        // Finding the index of the first non-whitespace character from the beginning of the line
         while (isspace(str[start])) {
             start++;
         }
-        // Знаходження індексу останнього непробільного символу з кінця рядка
+        // Finding the index of the last non-whitespace character from the end of the line
         while (end > start && isspace(str[end])) {
             end--;
         }
-        // Зміна рядка, щоб він включав лише символи без пробілів
+        // Change the line so that it includes only symbols without spaces
         memmove(str, str + start, end - start + 1);
         str[end - start + 1] = '\0';
         ///
@@ -170,7 +164,7 @@ int c(char **polia,int records,int n_l_rec){
     }
 
     scanf("%d",&y);//načíta celé číslo Y
-    ///створює динамічні рядки та підщитує його рядки та тп.
+    //creates dynamic lines and supports its lines, etc.
     y*=100;
     FILE *k;
 
@@ -184,18 +178,17 @@ int c(char **polia,int records,int n_l_rec){
     if (strlen(line) > 0 && (line[strlen(line) - 1] == '\n' || line[strlen(line) - 1] == '\r')) {
         ++records_k;
     }
-    printf("row_k: %d\n",(row_k+1));
-    printf("records_k: %d\n",records_k);
+
     int n_l_rec_k=(row_k+1)/(records_k);//to read the last empty line
-    printf("n_l_rec_k: %d\n\n",n_l_rec_k);
+
 
     rewind(k);
     char **polia_k=NULL;
     polia_k=(char**)malloc(row_k * sizeof(char*));
-    for (int i = 0; i < row_k; i++) {//Zapís takom poradí, v akom sú v textovom súbore
+    for (int i = 0; i < row_k; i++) {//Write them in the order they are in the text file
         fgets(line, sizeof(line), k);
         (polia_k)[i] = strdup(line);
-        ///обрізання кінців строк
+        ///cropping the ends of terms
         char *str_k=(polia_k)[i];
         int start = 0;
         size_t end = strlen(str_k) - 1;
@@ -213,21 +206,15 @@ int c(char **polia,int records,int n_l_rec){
 
     int r=0;
     int g=0;
-    int all_lines=0;
-    int all_lines_correct=0;//string validation
+    int found1=0;
+    int found2=0;
     int number_of_lines[records];
-    memset(number_of_lines, 0, sizeof(number_of_lines));//встановив всі зміні масиву на нуль
+    memset(number_of_lines, 0, sizeof(number_of_lines));//set all array variables to zero
     int of=0;
 
     for(int i = 0; i < records; i++) {
         for (int j = 0; j < row_k; j++) {
             if (strcmp(polia[r], polia_k[g]) == 0) {
-                if (of < records) {//провірка , можна видалити
-                    number_of_lines[of] = r;
-                    ++of;
-                }
-                ++all_lines;
-//                printf("Поле %s ідентичне полю %s в %d %d в ciachovanie.txt\n", polia[r], polia_k[g], r, g); провірка для себе, можна видилити при відправці
                 char *endptr_k;
                 char *endptr;
                 ++g;
@@ -237,26 +224,38 @@ int c(char **polia,int records,int n_l_rec){
                 r -= 5;
                 --g;
 
+                long firstFourDigitsk=date_k/10000;
+                long lastFourDigitsk = date_k % 10000;
+                long firstFourDigits=date/10000;
+                long lastFourDigits = date % 10000;
+                ///if there are numbers 20230810 and 20231011, then it will be 1 month after ciachovani if you choose y=1, if there are 20230810 and 20231009, then there will be 0 months after ciachovani
                 if (date_k < date) {
-                    long e = date - date_k;
-                    if (e > y) {
-                        e /= 100;
-                        y /= 100;
-                        e = e - y;
-                        printf("ID. mer. modulu [%s] má %ld mesiacov po ciachovani\n", polia[r], e);
-                        y *= 100;
+                    if (firstFourDigits>firstFourDigitsk){
+                        long cislodo=firstFourDigits-firstFourDigitsk;
+                        cislodo*=12;
+                        long cisloko=(lastFourDigits-lastFourDigitsk)%100+cislodo;
+                        if (cisloko > y) {
+                            printf("ID. mer. modulu [%s] má %ld mesiacov po ciachovani\n", polia[r], cisloko);
+                            found1=1;
+                        }
+                    } else {
+                        long e = date - date_k;
+                        if (e > y) {
+                            e /= 100;
+                            y /= 100;
+                            e = e - y;
+                            printf("ID. mer. modulu [%s] má %ld mesiacov po ciachovani\n", polia[r], e);
+                            y *= 100;
+                            found1 = 1;
 
+                        }
                     }
-//                    printf("%s менше, ніж %s\n", polia_k[g], polia[r]); також провірка, можна видилити до відправки
 
-                } else {
-                    ++all_lines_correct;//для провірки чи поля при ciachovani рівні
                 }
-
-                break;  // Якщо знайдено ідентичне поле, перейти до наступного поля
+                break;  // If an identical field is found, move to the next field
             }
             g+=n_l_rec_k;
-            if(g>=row_k/*17*/){///код
+            if(g>=row_k){
                 break;
             }
 
@@ -264,54 +263,41 @@ int c(char **polia,int records,int n_l_rec){
         r += n_l_rec;
     }
 
-/////////
-    int is_present_7_to_35 = 1;
-    int is_present_42_to_56 = 1;
-    int is_present_63 = 1;
+    int mas_p[records_k];
+    char mer_p[records][6];
+    int p=0;
+    int s=0;
+    for (int i = 0; i < records; ++i) {
+        mas_p[i]=records_k;
+    }
 
-    for (int i = 0; i <= 35; i+=7) {
-        for (int j = 0; j < 6; ++j) {
-            if (number_of_lines[j] == i) {
-                is_present_7_to_35 = 0;
-                break;
+    for (int i = 0; i < n_l_rec*records; i+=n_l_rec) {//walks on two arrays and looking for Id that are not ciachovani
+        for (int j = 0; j < n_l_rec_k*records_k; j+=n_l_rec_k) {
+            if (strcmp(polia[i],polia_k[j])!=0){
+                mas_p[p]-=1;
             }
         }
-    }
-
-    for (int i = 42; i <= 56; i+=7) {
-        for (int j = 6; j < 9; ++j) {
-            if (number_of_lines[j] == i) {
-                is_present_42_to_56 = 0;
-                break;
-            }
+        if (mas_p[p]==0){
+            strcpy(mer_p[s],polia[i]);
+            s++;
         }
-    }
-
-    if (number_of_lines[9] == 63) {
-        is_present_63 = 0;
+        p++;
     }
 
 
-    if (is_present_7_to_35) {
-        printf("ID. mer. modulu [%s] nie je ciachovany.\n",polia[7]);
-    }
-    if (is_present_42_to_56) {
-        printf("ID. mer. modulu [%s] nie je ciachovany.\n",polia[42]);
-    }
-    if (is_present_63) {
-        printf("ID. mer. modulu [%s] nie je ciachovany.\n",polia[63]);
+    for (int i = 0; i < s; ++i) {//prescribes which are not ciachovani
+        printf("ID. mer. modulu [%s] nie je ciachovany.\n",mer_p[i]);
+        found2=1;
     }
 
 //////////
-    printf("\n");
-    if(number_of_lines[records]!=0) {//випишше що всі Ід коректні якщо всі були ciachovany
-        if (all_lines == all_lines_correct) {//checking that all lines are correct
-            printf("Data su korektne.");
-        }
+
+    if( !found1 && !found2) {//write that all Ids are correct if all were ciachovany and right
+        printf("Data su korektne.\n");
     }
 
 
-    for (int i = 0; i < row_k; ++i) {//все звільняє
+    for (int i = 0; i < row_k; ++i) {//frees everything
         free(polia_k[i]);
     }
     free(polia_k);
@@ -354,7 +340,7 @@ int s (char **polia,int row,int n_l_rec,int records){
     }
     k=0;
 
-    //які блоки знайшло
+    //which blocks it found
     int h=0;
     for (int i = 0; i < records; ++i) {//which ID and Typ mer intersect
         for (int j = 0; j < records; ++j) {
@@ -411,18 +397,18 @@ int s (char **polia,int row,int n_l_rec,int records){
     char combined[k][50];
     for (int i = 0; i < k; ++i) {//concatenates sorted strings
         strncpy(pozmodl[i], polia[cislageneral[i]+1], 14);
-        pozmodl[i][14] = '\0';// Додаю завершуючий нуль для визначення кінця рядка
+        pozmodl[i][14] = '\0';// I add a trailing zero to determine the end of the line
         sscanf(pozmodl[i],"%7s %7s",part1[i],part2[i]);
         number=atof(polia[cislageneral[i]+3]);
         sprintf(strfloat[i], "%.5f", number);
         sprintf(combined[i], "%s\t%s\t%s\t %s", resultpolia[i], strfloat[i], part1[i], part2[i]);
 
     }
-
-    printf("\n");
+    ///for myself
     for (int i = 0; i < k; ++i) {
     printf("Zreťazený reťazec: %s\n", combined[i]);
     }
+    printf("\n");
     ///
 
     if (filed != NULL) {
@@ -447,15 +433,15 @@ int h(char **polia,int row,int n_l_rec,int records){
         return 1;
     }
     char *typeStrings[] = {"RM", "RD", "RO","PI","PE","PA"};
-    int numTypes=sizeof(typeStrings) / sizeof(typeStrings[0]);//скільки типів записів
+    int numTypes=sizeof(typeStrings) / sizeof(typeStrings[0]);//how many types of records
     int count[records];
     memset(count, 0, sizeof(count));
-    int located[sizeof(typeStrings) / sizeof(typeStrings[0])][records];//скільки типів записів та всього скільки блоків
+    int located[sizeof(typeStrings) / sizeof(typeStrings[0])][records];//how many types of records and how many blocks in total
 
-    for (int i = 2; i < row; i+=n_l_rec) {//порівнює Typ mer. vel считає скільки є та їхню локацію
-        if (strcmp(typeStrings[0],polia[i])==0){
-            located[0][count[0]]=i;
-            count[0]++;
+    for (int i = 2; i < row; i+=n_l_rec) {//compares Typ mer. vel counts how many there are and their location
+        if (strcmp(typeStrings[0],polia[i])==0){//compares Typ mer. veliciny
+            located[0][count[0]]=i;//remembers the location
+            count[0]++;//at the same time, it counts the number and changes it to the next slen in the static array
         }
         if (strcmp(typeStrings[1],polia[i])==0){
             located[1][count[1]]=i;
@@ -478,27 +464,28 @@ int h(char **polia,int row,int n_l_rec,int records){
             count[5]++;
         }
     }
-    // створюємо кільуісь записів мін та макс та робим рядки по 7
+    // we create the number of min and max records and make rows of 7
     char min[sizeof(typeStrings) / sizeof(typeStrings[0])][7];
     char max[sizeof(typeStrings) / sizeof(typeStrings[0])][7];
-    for (int j = 0; j < numTypes; ++j) {//відсортовуємо макс та мінімум
-        if(count[j]!=0){//якщо є зписи Typ mer. vel
+
+    for (int j = 0; j < numTypes; ++j) {//we sort max and min
+        if(count[j]!=0){//if there are Typ mer listings. vel
             strcpy(min[j], polia[located[j][0]+1]);
             strcpy(max[j], polia[located[j][0]+1]);
 
-            for (int i = 1; i < count[j]; ++i) {
+            for (int i = 1; i < count[j]; ++i) {//changes if more or less
                 if (strcmp(polia[located[j][i]+1],min[j])<0) {
                     strcpy(min[j], polia[located[j][i]+1]);
                 }
 
-                if (strcmp(polia[located[j][i]+1],min[j])>0) {
+                if (strcmp(polia[located[j][i]+1],max[j])>0) {
                     strcpy(max[j], polia[located[j][i]+1]);
                 }
             }
 
         }
     }
-    //виписує записи
+    ///виписує записи
     printf("%-15s %-10s %-10s %-10s\n", "Typ mer. vel", "Pocetnost", "Minimum", "Maximum");
     for (int i = 0; i < numTypes; ++i) {
         if (count[i]!=0){
@@ -531,7 +518,7 @@ int z(char ***polia,int *row, int *records, int n_l_rec){
 
         }
     }
-    if(k==0){//провірка на те чи знайдений Ід
+    if(k==0){//check whether ID is found
         fprintf(stderr,"Pre dany vstup neexistuju zaznamy");
         return 1;
     }
@@ -554,10 +541,10 @@ int z(char ***polia,int *row, int *records, int n_l_rec){
     int new_row_size = *row - removed_rows;
     char **temp_polia = (char **)calloc(new_row_size , sizeof(char *));
     int new_row_index = 0;
-    for (int i = 0; i < *row; ++i) {//видаляє рядки
+    for (int i = 0; i < *row; ++i) {//deletes rows
         int in_removed_range = 0;
         for (int j = 0; j < k; ++j) {
-            if (i >= row_to_remove_start[j] && i <= row_to_remove_end[j]) {//якщо вірно то не перезаписує а видалює пізніше по циклу
+            if (i >= row_to_remove_start[j] && i <= row_to_remove_end[j]) {//if true, it does not overwrite but deletes later in the cycle
                 in_removed_range = 1;
                 break;
             }
@@ -571,7 +558,7 @@ int z(char ***polia,int *row, int *records, int n_l_rec){
             }
             new_row_index++;
         } else {
-            // Звільнення пам'яті для видалених рядків
+            // Freeing memory for deleted rows
             free((*polia)[i]);
         }
     }
@@ -581,10 +568,8 @@ int z(char ***polia,int *row, int *records, int n_l_rec){
     }
 
 
-
-
     *polia = temp_polia;
-    // Оновлення кількості рядків у головній функції та записів
+    // Update the number of rows in the main function and records
     *row = new_row_size;
     *records-=k;
     printf("Vymazalo sa: %d zaznamov!\n", k);
@@ -600,7 +585,7 @@ void uvolni(char**polia,int row){
 int main() {
     FILE *f=NULL;
     char **polia=NULL;
-    int row=0;///перевірити чи потрібні ця зміна в інших комиандах
+    int row=0;
     int records=0;
     int n_l_rec=0;
     char option;
