@@ -7,9 +7,6 @@ void uvolni(char** polia, int row);
 
 int v(FILE**f, char**polia,int n_l_rec,int records){
 
-    ///повино провіряти чи файл вже открит після n
-    ///помилка мабуть є в цьому
-    /// перевірити чи нормально відкриває файл якщо його немає r+ w
     if(*f==NULL){//the program detects whether the txt file has already been opened
         printf("súbor ešte nebol otvorený\n");
         if((*f= fopen("dataloger.txt","r+"))!=NULL) {
@@ -18,6 +15,7 @@ int v(FILE**f, char**polia,int n_l_rec,int records){
             printf("Neotvoreny subor\n");
         }
     }
+
     if (*f!=NULL){/*In case of successful opening of the txt file*/
         if (polia!=NULL){//if dynamic fields have already been created, they will be written from
             int r=0;
@@ -79,12 +77,7 @@ int v(FILE**f, char**polia,int n_l_rec,int records){
                 printf("\n");
 
             }
-            ///провірка для себе чи до кінця прочитався файл
-//            if (feof(*f)) {
-//                printf("End of file reached.\n");
-//            } else if (ferror(*f)) {
-//                perror("Error reading file");
-//            }
+
             rewind(*f);
         }
     }
@@ -165,6 +158,7 @@ int c(char **polia,int records,int n_l_rec){
 
     scanf("%d",&y);//načíta celé číslo Y
     //creates dynamic lines and supports its lines, etc.
+
     y*=100;
     FILE *k;
 
@@ -210,10 +204,9 @@ int c(char **polia,int records,int n_l_rec){
     int found2=0;
     int number_of_lines[records];
     memset(number_of_lines, 0, sizeof(number_of_lines));//set all array variables to zero
-    int of=0;
 
     for(int i = 0; i < records; i++) {
-        for (int j = 0; j < row_k; j++) {
+        for (int j = 0; j < records_k; j++) {
             if (strcmp(polia[r], polia_k[g]) == 0) {
                 char *endptr_k;
                 char *endptr;
@@ -255,9 +248,6 @@ int c(char **polia,int records,int n_l_rec){
                 break;  // If an identical field is found, move to the next field
             }
             g+=n_l_rec_k;
-            if(g>=row_k){
-                break;
-            }
 
         }
         r += n_l_rec;
@@ -290,7 +280,6 @@ int c(char **polia,int records,int n_l_rec){
         found2=1;
     }
 
-//////////
 
     if( !found1 && !found2) {//write that all Ids are correct if all were ciachovany and right
         printf("Data su korektne.\n");
@@ -393,7 +382,7 @@ int s (char **polia,int row,int n_l_rec,int records){
     char part1[k][8];
     char part2[k][8];
     char strfloat[k][10];
-    float number=0;
+    float number;
     char combined[k][50];
     for (int i = 0; i < k; ++i) {//concatenates sorted strings
         strncpy(pozmodl[i], polia[cislageneral[i]+1], 14);
@@ -541,6 +530,7 @@ int z(char ***polia,int *row, int *records, int n_l_rec){
     int new_row_size = *row - removed_rows;
     char **temp_polia = (char **)calloc(new_row_size , sizeof(char *));
     int new_row_index = 0;
+
     for (int i = 0; i < *row; ++i) {//deletes rows
         int in_removed_range = 0;
         for (int j = 0; j < k; ++j) {
@@ -560,6 +550,7 @@ int z(char ***polia,int *row, int *records, int n_l_rec){
         } else {
             // Freeing memory for deleted rows
             free((*polia)[i]);
+            (*polia)[i] = NULL;
         }
     }
 
