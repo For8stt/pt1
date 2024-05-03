@@ -16,6 +16,7 @@ int v(FILE**f, char**polia,int n_l_rec,int records){
         }
     }
 
+
     if (*f!=NULL){/*In case of successful opening of the txt file*/
         if (polia!=NULL){//if dynamic fields have already been created, they will be written from
             int r=0;
